@@ -22,7 +22,8 @@
 				"bierner.markdown-mermaid",
 				"corschenzi.mermaid-graphical-editor",
 				"ms-azuretools.vscode-docker",
-				"streetsidesoftware.code-spell-checker"
+				"streetsidesoftware.code-spell-checker",
+				"RooVeterinaryInc.roo-cline"
 			]
 		}
 	}
