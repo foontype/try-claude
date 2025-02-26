@@ -1,0 +1,20 @@
+services:
+  workspace:
+    build:
+      context: ../..
+      dockerfile: ./run/containers/workspace/Dockerfile
+      args:
+        - CONTAINER_UID=${CONTAINER_UID:?}
+        - CONTAINER_GID=${CONTAINER_GID:?}
+        - HTTP_PROXY
+        - HTTPS_PROXY
+        - NO_PROXY
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    command: sleep infinity
+    environment:
+      - RUN_TARGET_ENV=workspace
+      - LOCAL_TERMINAL=${LOCAL_TERMINAL}
+    volumes:
+      - ../..:/workspace
