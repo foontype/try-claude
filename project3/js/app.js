@@ -33,7 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 idle: 1.0,    // Normal speed for idle animation
                 walk: 1.0,    // Normal speed for walking animation
                 run: 1.5      // Faster speed for running animation
-            }
+            },
+            blendingSpeed: 0.03 // Animation transition blending time in seconds
         }, (player) => {
             console.log('Player created');
             

@@ -33,6 +33,15 @@ class Player extends SceneObject {
         this.walkAnimSpeedRatio = 1.0;
         this.runAnimSpeedRatio = 1.5; // Faster animation for running
         
+        // Animation blending parameters
+        this.blendingSpeed = 0.02; // Animation blending time in seconds
+
+        // Enable animation blending for all animations
+        this.scene.animationPropertiesOverride = new BABYLON.AnimationPropertiesOverride();
+        this.scene.animationPropertiesOverride.enableBlending = true;
+        this.scene.animationPropertiesOverride.blendingSpeed = this.blendingSpeed;
+        this.scene.animationPropertiesOverride.loopMode = 1;
+        
         // Set up input handling
         this.setupInputControls();
     }
@@ -200,58 +209,30 @@ class Player extends SceneObject {
         
         // Only change animation if needed
         if (!this.currentAnimation || this.currentAnimationName !== targetAnimationName) {
-            // Stop current animation if any
-            if (this.currentAnimation) {
-                this.currentAnimation.stop();
-            }
-            
-            this.currentAnimationName = targetAnimationName;
-            
             // Find the animation group
             const targetAnimation = this._findAnimationGroup(targetAnimationName);
             if (targetAnimation) {
                 // Determine the appropriate animation speed
                 let speedRatio = this.idleAnimSpeedRatio;
-                
                 if (targetAnimationName === this.walkAnimationName) {
                     speedRatio = this.walkAnimSpeedRatio;
                 } else if (targetAnimationName === this.runAnimationName) {
                     speedRatio = this.runAnimSpeedRatio;
                 }
                 
-                // Adjust global animation speed based on movement direction
-                if (this.isMovingBackward) {
-                    this.scene.animationTimeScale = -speedRatio;
-                } else {
-                    this.scene.animationTimeScale = speedRatio;
+                this.scene.animationTimeScale = speedRatio;
+
+                // Start the animation with blending
+                if (this.currentAnimation) {
+                    this.currentAnimation.stop();
                 }
-                
-                // Start the animation
-                targetAnimation.start(true); // loop = true
+ 
+                targetAnimation.start(true);
+               
                 this.currentAnimation = targetAnimation;
+                this.currentAnimationName = targetAnimationName;
                 
-                console.log(`Playing animation: ${targetAnimationName} (timeScale: ${this.scene.animationTimeScale})`);
-            } else {
-                console.log(`Animation not found: ${targetAnimationName}`);
-                
-                // If run animation not found, fallback to walk animation when dashing
-                if (targetAnimationName === this.runAnimationName) {
-                    const walkAnimation = this._findAnimationGroup(this.walkAnimationName);
-                    if (walkAnimation) {
-                        // Adjust global animation speed based on movement direction
-                        if (this.isMovingBackward) {
-                            this.scene.animationTimeScale = -speedRatio;
-                        } else {
-                            this.scene.animationTimeScale = speedRatio;
-                        }
-                           
-                        walkAnimation.start(true);
-                        this.currentAnimation = walkAnimation;
-                        this.currentAnimationName = this.walkAnimationName;
-                        
-                        console.log(`Fallback to animation: ${this.walkAnimationName} (timeScale: ${this.scene.animationTimeScale})`);
-                    }
-                }
+                console.log(`Playing animation: ${targetAnimationName} with blending (${this.blendingSpeed}s)`);
             }
         }
     }
@@ -295,5 +276,14 @@ class Player extends SceneObject {
      */
     setRotationSpeed(speed) {
         this.rotationSpeed = speed;
+    }
+    
+    /**
+     * Set animation blending speed
+     * @param {number} blendingSpeed - Blending time in seconds 
+     */
+    setBlendingSpeed(blendingSpeed) {
+        this.blendingSpeed = blendingSpeed;
+        this.scene.animationPropertiesOverride.blendingSpeed = this.blendingSpeed;
     }
 }

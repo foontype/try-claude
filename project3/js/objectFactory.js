@@ -28,6 +28,7 @@ class ObjectFactory {
      * @param {number} [options.animationSpeeds.idle] - Speed ratio for idle animation
      * @param {number} [options.animationSpeeds.walk] - Speed ratio for walk animation
      * @param {number} [options.animationSpeeds.run] - Speed ratio for run animation
+     * @param {number} [options.blendingSpeed] - Animation blending time in seconds
      * @param {Function} [callback] - Callback function when player is created
      */
     createPlayer(id, options = {}, callback) {
@@ -45,7 +46,8 @@ class ObjectFactory {
                 idle: 1.0,
                 walk: 1.0,
                 run: 1.5
-            }
+            },
+            blendingSpeed: 0.03
         };
         
         // Merge default options with provided options
@@ -88,6 +90,11 @@ class ObjectFactory {
                     if (config.animationSpeeds.run !== undefined) {
                         player.runAnimSpeedRatio = config.animationSpeeds.run;
                     }
+                }
+                
+                // Set animation blending
+                if (config.blendingSpeed !== undefined) {
+                    player.setBlendingSpeed(config.blendingSpeed);
                 }
                 
                 // Log available animations if skeletons are present
@@ -197,6 +204,11 @@ class ObjectFactory {
             if (config.animationSpeeds.run !== undefined) {
                 player.runAnimSpeedRatio = config.animationSpeeds.run;
             }
+        }
+        
+        // Set animation blending
+        if (config.blendingSpeed !== undefined) {
+            player.blendingSpeed = config.blendingSpeed;
         }
         
         // Call callback with created player
