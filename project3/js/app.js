@@ -25,8 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
             speed: 2.00,
             scale: 0.01, // Scale the model to small size
             animations: {
-                walkAnimation: "Walk", // Animation to play when moving
+                walkAnimation: "Walk", // Animation to play when moving normally
+                runAnimation: "Run",   // Animation to play when dashing (shift + movement)
                 idleAnimation: "Survey" // Animation to play when idle
+            },
+            animationSpeeds: {
+                idle: 1.0,    // Normal speed for idle animation
+                walk: 1.0,    // Normal speed for walking animation
+                run: 2.4      // Faster speed for running animation
             }
         }, (player) => {
             console.log('Player created');

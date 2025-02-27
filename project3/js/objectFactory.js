@@ -22,7 +22,12 @@ class ObjectFactory {
      * @param {number|BABYLON.Vector3} [options.scale] - Scale factor for the model (optional)
      * @param {Object} [options.animations] - Animation configuration (optional)
      * @param {string} [options.animations.walkAnimation] - Name of walking animation
+     * @param {string} [options.animations.runAnimation] - Name of running animation
      * @param {string} [options.animations.idleAnimation] - Name of idle animation
+     * @param {Object} [options.animationSpeeds] - Animation speed configuration (optional)
+     * @param {number} [options.animationSpeeds.idle] - Speed ratio for idle animation
+     * @param {number} [options.animationSpeeds.walk] - Speed ratio for walk animation
+     * @param {number} [options.animationSpeeds.run] - Speed ratio for run animation
      * @param {Function} [callback] - Callback function when player is created
      */
     createPlayer(id, options = {}, callback) {
@@ -33,7 +38,13 @@ class ObjectFactory {
             scale: 1.0,
             animations: {
                 walkAnimation: "Walk",
+                runAnimation: "Run",
                 idleAnimation: "Survey"
+            },
+            animationSpeeds: {
+                idle: 1.0,
+                walk: 1.0,
+                run: 1.5
             }
         };
         
@@ -58,8 +69,24 @@ class ObjectFactory {
                     if (config.animations.walkAnimation) {
                         player.walkAnimationName = config.animations.walkAnimation;
                     }
+                    if (config.animations.runAnimation) {
+                        player.runAnimationName = config.animations.runAnimation;
+                    }
                     if (config.animations.idleAnimation) {
                         player.idleAnimationName = config.animations.idleAnimation;
+                    }
+                }
+                
+                // Set animation speeds
+                if (config.animationSpeeds) {
+                    if (config.animationSpeeds.idle !== undefined) {
+                        player.idleAnimSpeedRatio = config.animationSpeeds.idle;
+                    }
+                    if (config.animationSpeeds.walk !== undefined) {
+                        player.walkAnimSpeedRatio = config.animationSpeeds.walk;
+                    }
+                    if (config.animationSpeeds.run !== undefined) {
+                        player.runAnimSpeedRatio = config.animationSpeeds.run;
                     }
                 }
                 
@@ -151,8 +178,24 @@ class ObjectFactory {
             if (config.animations.walkAnimation) {
                 player.walkAnimationName = config.animations.walkAnimation;
             }
+            if (config.animations.runAnimation) {
+                player.runAnimationName = config.animations.runAnimation;
+            }
             if (config.animations.idleAnimation) {
                 player.idleAnimationName = config.animations.idleAnimation;
+            }
+        }
+        
+        // Set animation speeds
+        if (config.animationSpeeds) {
+            if (config.animationSpeeds.idle !== undefined) {
+                player.idleAnimSpeedRatio = config.animationSpeeds.idle;
+            }
+            if (config.animationSpeeds.walk !== undefined) {
+                player.walkAnimSpeedRatio = config.animationSpeeds.walk;
+            }
+            if (config.animationSpeeds.run !== undefined) {
+                player.runAnimSpeedRatio = config.animationSpeeds.run;
             }
         }
         

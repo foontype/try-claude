@@ -17,12 +17,21 @@ class Player extends SceneObject {
         this.speed = 0.1;
         this.rotationSpeed = 0.02; // Reduced rotation speed for slower turning
         this.isMoving = false;
+        this.isDashing = false;
+        this.isMovingBackward = false; // Track if moving backward
+        this.dashSpeedMultiplier = 1.5; // Speed multiplier when dashing
         
-        // Animation names
+        // Animation properties
         this.walkAnimationName = "Walk";
+        this.runAnimationName = "Run";
         this.idleAnimationName = "Survey";
         this.currentAnimationName = "";
         this.currentAnimation = null;
+        
+        // Animation speed ratios
+        this.idleAnimSpeedRatio = 1.0;
+        this.walkAnimSpeedRatio = 1.0;
+        this.runAnimSpeedRatio = 1.5; // Faster animation for running
         
         // Set up input handling
         this.setupInputControls();
@@ -71,6 +80,10 @@ class Player extends SceneObject {
      */
     updateFromInput() {
         this.isMoving = false;
+        this.isMovingBackward = false;
+        
+        // Check if shift key is pressed for dashing
+        this.isDashing = this.inputMap["Shift"];
         
         // Forward movement
         if (this.inputMap["w"] || this.inputMap["ArrowUp"]) {
@@ -82,6 +95,7 @@ class Player extends SceneObject {
         if (this.inputMap["s"] || this.inputMap["ArrowDown"]) {
             this.moveBackward();
             this.isMoving = true;
+            this.isMovingBackward = true;
         }
         
         // Right rotation (inverted - pressing left key now rotates right)
@@ -104,10 +118,13 @@ class Player extends SceneObject {
     moveForward() {
         if (!this.rootMesh) return;
         
+        // Calculate actual speed based on whether dashing or not
+        const actualSpeed = this.isDashing ? this.speed * this.dashSpeedMultiplier : this.speed;
+        
         const forward = new BABYLON.Vector3(
-            Math.sin(this.rootMesh.rotation.y) * this.speed,
+            Math.sin(this.rootMesh.rotation.y) * actualSpeed,
             0,
-            Math.cos(this.rootMesh.rotation.y) * this.speed
+            Math.cos(this.rootMesh.rotation.y) * actualSpeed
         );
         
         this.position.addInPlace(forward);
@@ -120,10 +137,13 @@ class Player extends SceneObject {
     moveBackward() {
         if (!this.rootMesh) return;
         
+        // Calculate actual speed based on whether dashing or not
+        const actualSpeed = this.isDashing ? this.speed * this.dashSpeedMultiplier : this.speed;
+        
         const backward = new BABYLON.Vector3(
-            -Math.sin(this.rootMesh.rotation.y) * this.speed,
+            -Math.sin(this.rootMesh.rotation.y) * actualSpeed,
             0,
-            -Math.cos(this.rootMesh.rotation.y) * this.speed
+            -Math.cos(this.rootMesh.rotation.y) * actualSpeed
         );
         
         this.position.addInPlace(backward);
@@ -167,48 +187,85 @@ class Player extends SceneObject {
             this._animationsLogged = true;
         }
         
-        // Switch between idle and walk animations based on movement
+        let targetAnimationName = this.idleAnimationName; // Default to idle
+        
+        // Determine which animation to play based on movement and dash state
         if (this.isMoving) {
-            // Play walk animation if not already playing
-            if (!this.currentAnimation || this.currentAnimationName !== this.walkAnimationName) {
-                // Stop current animation if any
-                if (this.currentAnimation) {
-                    this.currentAnimation.stop();
+            if (this.isDashing) {
+                targetAnimationName = this.runAnimationName; // Run animation when dashing
+            } else {
+                targetAnimationName = this.walkAnimationName; // Walk animation when moving normally
+            }
+        }
+        
+        // Only change animation if needed
+        if (!this.currentAnimation || this.currentAnimationName !== targetAnimationName) {
+            // Stop current animation if any
+            if (this.currentAnimation) {
+                this.currentAnimation.stop();
+            }
+            
+            this.currentAnimationName = targetAnimationName;
+            
+            // Find the animation group
+            const targetAnimation = this._findAnimationGroup(targetAnimationName);
+            if (targetAnimation) {
+                // Determine the appropriate animation speed
+                let speedRatio = this.idleAnimSpeedRatio;
+                
+                if (targetAnimationName === this.walkAnimationName) {
+                    speedRatio = this.walkAnimSpeedRatio;
+                } else if (targetAnimationName === this.runAnimationName) {
+                    speedRatio = this.runAnimSpeedRatio;
                 }
                 
-                this.currentAnimationName = this.walkAnimationName;
-                
-                // Find the animation group
-                const walkAnimation = this._findAnimationGroup(this.walkAnimationName);
-                if (walkAnimation) {
-                    // Play the walk animation
-                    walkAnimation.start(true); // loop = true
-                    this.currentAnimation = walkAnimation;
-                    console.log(`Playing animation: ${this.walkAnimationName}`);
+                // Adjust global animation speed based on movement direction
+                if (this.isMovingBackward) {
+                    // For backward movement, use a special animation time scale
+                    this.scene.animationTimeScale = 0.7;
+                } else if (this.isDashing) {
+                    // For dashing, use a faster animation time scale
+                    this.scene.animationTimeScale = 1.5;
                 } else {
-                    console.log(`Animation not found: ${this.walkAnimationName}`);
+                    // Normal movement
+                    this.scene.animationTimeScale = 1.0;
+                }
+                
+                // Start the animation
+                targetAnimation.start(true); // loop = true
+                this.currentAnimation = targetAnimation;
+                
+                console.log(`Playing animation: ${targetAnimationName} (timeScale: ${this.scene.animationTimeScale})`);
+            } else {
+                console.log(`Animation not found: ${targetAnimationName}`);
+                
+                // If run animation not found, fallback to walk animation when dashing
+                if (targetAnimationName === this.runAnimationName) {
+                    const walkAnimation = this._findAnimationGroup(this.walkAnimationName);
+                    if (walkAnimation) {
+                        // Adjust global animation speed
+                        if (this.isMovingBackward) {
+                            this.scene.animationTimeScale = 0.7;
+                        } else {
+                            this.scene.animationTimeScale = 1.5;
+                        }
+                        
+                        walkAnimation.start(true);
+                        this.currentAnimation = walkAnimation;
+                        this.currentAnimationName = this.walkAnimationName;
+                        
+                        console.log(`Fallback to animation: ${this.walkAnimationName} (timeScale: ${this.scene.animationTimeScale})`);
+                    }
                 }
             }
         } else {
-            // Play idle animation if not already playing
-            if (!this.currentAnimation || this.currentAnimationName !== this.idleAnimationName) {
-                // Stop current animation if any
-                if (this.currentAnimation) {
-                    this.currentAnimation.stop();
-                }
-                
-                this.currentAnimationName = this.idleAnimationName;
-                
-                // Find the animation group
-                const idleAnimation = this._findAnimationGroup(this.idleAnimationName);
-                if (idleAnimation) {
-                    // Play the idle animation
-                    idleAnimation.start(true); // loop = true
-                    this.currentAnimation = idleAnimation;
-                    console.log(`Playing animation: ${this.idleAnimationName}`);
-                } else {
-                    console.log(`Animation not found: ${this.idleAnimationName}`);
-                }
+            // Update animation speed if direction changes while keeping same animation
+            if (this.isMovingBackward) {
+                this.scene.animationTimeScale = 0.7;
+            } else if (this.isDashing) {
+                this.scene.animationTimeScale = 1.5;
+            } else {
+                this.scene.animationTimeScale = 1.0;
             }
         }
     }
