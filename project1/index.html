@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sparkling Emoji</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #emoji-container {
+            position: relative;
+            z-index: 10;
+        }
+
+        #emoji {
+            font-size: 120px;
+            text-align: center;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+    <div id="emoji-container">
+        <div id="emoji">😊</div>
+    </div>
+
+    <script>
+        // Get the canvas and its context
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas dimensions to match window
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        // Call resize initially and on window resize
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Get emoji element
+        const emoji = document.getElementById('emoji');
+        
+        // Function to get current emoji center position
+        function getEmojiCenter() {
+            const emojiRect = emoji.getBoundingClientRect();
+            return {
+                x: emojiRect.left + emojiRect.width / 2,
+                y: emojiRect.top + emojiRect.height / 2
+            };
+        }
+        
+        // Particle class
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                // Get current emoji center position
+                const center = getEmojiCenter();
+                
+                // Position particles at the emoji center
+                this.x = center.x;
+                this.y = center.y;
+                
+                // Random initial size (half the original size)
+                this.initialSize = (1 + Math.random() * 3) * 1.5 * 0.5;
+                this.size = this.initialSize;
+                
+                // Radial movement outward
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1 + Math.random() * 3;
+                this.initialSpeedX = Math.cos(angle) * speed;
+                this.initialSpeedY = Math.sin(angle) * speed;
+                this.speedX = this.initialSpeedX;
+                this.speedY = this.initialSpeedY;
+                
+                // Random colors (star-like and purple)
+                const colors = ['#FFD700', '#FFFACD', '#FFFFE0', '#FFF8DC', '#FFFFFF', '#800080', '#9370DB', '#9932CC', '#BA55D3', '#DDA0DD'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Lifespan and opacity
+                this.life = 0;
+                this.maxLife = 50 + Math.random() * 100;
+                this.opacity = 0;
+            }
+            
+            update() {
+                // Update life
+                this.life++;
+                
+                // Gradually increase size over time (up to 6x initial size - 1.5x larger than before)
+                const growthFactor = 1 + (this.life / this.maxLife) * 5;
+                this.size = this.initialSize * Math.min(growthFactor, 6);
+                
+                // Gradually increase speed over time (up to 4x initial speed - 2x faster than before)
+                const speedFactor = 1 + (this.life / this.maxLife) * 3;
+                this.speedX = this.initialSpeedX * Math.min(speedFactor, 4);
+                this.speedY = this.initialSpeedY * Math.min(speedFactor, 4);
+                
+                // Update position with current speed
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // Get current emoji center
+                const center = getEmojiCenter();
+                
+                // Calculate distance from center
+                const dx = this.x - center.x;
+                const dy = this.y - center.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Fade based on distance (max distance for full transparency is 600px - half speed fading)
+                const distanceFade = Math.max(0, 1 - distance / 600);
+                
+                // Fade in and out based on life
+                let lifeFade;
+                if (this.life < 20) {
+                    lifeFade = this.life / 20;
+                } else if (this.life > this.maxLife - 20) {
+                    lifeFade = (this.maxLife - this.life) / 20;
+                } else {
+                    lifeFade = 1;
+                }
+                
+                // Combine both fade factors
+                this.opacity = lifeFade * distanceFade;
+                
+                // Reset when life is over
+                if (this.life >= this.maxLife) {
+                    this.reset();
+                }
+                
+                // Twinkle effect
+                this.opacity *= 0.9 + Math.random() * 0.2;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        // Create particles
+        const particles = [];
+        const particleCount = 50;
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+        
+        // Animation loop
+        function animate() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update and draw particles
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            // Draw star shapes
+            particles.forEach(particle => {
+                if (particle.opacity > 0.7 && Math.random() > 0.8) {
+                    drawStar(particle.x, particle.y, 4, particle.size * 2, particle.size, particle.color, particle.opacity * 0.7);
+                }
+            });
+            
+            // Continue animation
+            requestAnimationFrame(animate);
+        }
+        
+        // Function to draw a star
+        function drawStar(cx, cy, spikes, outerRadius, innerRadius, color, alpha) {
+            let rot = Math.PI / 2 * 3;
+            let x = cx;
+            let y = cy;
+            let step = Math.PI / spikes;
+            
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerRadius);
+            
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rot) * outerRadius;
+                y = cy + Math.sin(rot) * outerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+                
+                x = cx + Math.cos(rot) * innerRadius;
+                y = cy + Math.sin(rot) * innerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+            }
+            
+            ctx.lineTo(cx, cy - outerRadius);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.globalAlpha = alpha;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+        
+        // Ripple class
+        class Ripple {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                // Get current emoji center position
+                const center = getEmojiCenter();
+                
+                // Position ripple at the emoji center
+                this.x = center.x;
+                this.y = center.y;
+                
+                // Initial size and growth rate
+                this.size = 10;
+                this.growthRate = 5;
+                this.maxSize = 300;
+                
+                // Opacity
+                this.opacity = 0.8;
+                this.fadeRate = 0.01;
+            }
+            
+            update() {
+                // Grow the ripple
+                this.size += this.growthRate;
+                
+                // Fade out as it grows
+                if (this.size > 50) {
+                    this.opacity -= this.fadeRate;
+                }
+                
+                // Return true if the ripple is still visible
+                return this.opacity > 0;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = this.opacity;
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        // Create ripples array
+        const ripples = [];
+        
+        // Function to add a new ripple
+        function addRipple() {
+            ripples.push(new Ripple());
+        }
+        
+        // Set interval to add a ripple every second
+        setInterval(addRipple, 1000);
+        
+        // Add initial ripple
+        addRipple();
+        
+        // Animation loop with ripples
+        function animate() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update and draw ripples
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const isVisible = ripples[i].update();
+                if (isVisible) {
+                    ripples[i].draw();
+                } else {
+                    ripples.splice(i, 1);
+                }
+            }
+            
+            // Update and draw particles
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            // Draw star shapes
+            particles.forEach(particle => {
+                if (particle.opacity > 0.7 && Math.random() > 0.8) {
+                    drawStar(particle.x, particle.y, 4, particle.size * 2, particle.size, particle.color, particle.opacity * 0.7);
+                }
+            });
+            
+            // Continue animation
+            requestAnimationFrame(animate);
+        }
+        
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
