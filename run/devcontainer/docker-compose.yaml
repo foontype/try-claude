@@ -18,3 +18,10 @@ services:
       - LOCAL_TERMINAL=${LOCAL_TERMINAL}
     volumes:
       - ../..:/workspace
+
+  nginx:
+    image: nginx
+    volumes:
+      - ../..:/usr/share/nginx/html
+    ports:
+      - 80:80
