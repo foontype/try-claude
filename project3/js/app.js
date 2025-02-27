@@ -1,0 +1,56 @@
+/**
+ * Main application entry point
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the engine
+    const engine = new Engine('renderCanvas');
+    
+    // Create a scene
+    const sceneManager = new Scene(engine.getEngine());
+    const scene = sceneManager.getScene();
+    
+    // Create model loader
+    const modelLoader = new ModelLoader(scene);
+    
+    // Create object factory
+    const objectFactory = new ObjectFactory(scene, modelLoader);
+    
+    // For demonstration purposes, we'll create objects after a timeout
+    // In a real application, this might be triggered by user interaction
+    setTimeout(() => {
+        // Create a player
+        objectFactory.createPlayer('player1', {
+            modelPath: 'models/player.glb',
+            position: new BABYLON.Vector3(0, 0, 0),
+            speed: 2.00,
+            scale: 0.01 // Scale the model to half size
+        }, (player) => {
+            console.log('Player created');
+            
+            // Store player reference in a global variable for debug access
+            window.player = player;
+        });
+        
+        // Create some scene objects
+        objectFactory.createSceneObject('cube1', {
+            position: new BABYLON.Vector3(5, 0, 0)
+        }, (object) => {
+            console.log('Cube created at position (5, 0, 0)');
+        });
+        
+        objectFactory.createSceneObject('cube2', {
+            position: new BABYLON.Vector3(-5, 0, 0)
+        }, (object) => {
+            console.log('Cube created at position (-5, 0, 0)');
+        });
+        
+        objectFactory.createSceneObject('cube3', {
+            position: new BABYLON.Vector3(0, 0, 5)
+        }, (object) => {
+            console.log('Cube created at position (0, 0, 5)');
+        });
+    }, 1000);
+    
+    // Run the render loop
+    engine.runRenderLoop(scene);
+});
