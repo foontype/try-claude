@@ -15,7 +15,7 @@ class Player extends SceneObject {
         
         // Player-specific properties
         this.speed = 0.1;
-        this.rotationSpeed = 0.05;
+        this.rotationSpeed = 0.02; // Reduced rotation speed for slower turning
         this.isMoving = false;
         
         // Set up input handling
@@ -78,14 +78,14 @@ class Player extends SceneObject {
             this.isMoving = true;
         }
         
-        // Left rotation
+        // Right rotation (inverted - pressing left key now rotates right)
         if (this.inputMap["a"] || this.inputMap["ArrowLeft"]) {
-            this.rotateLeft();
+            this.rotateRight();
         }
         
-        // Right rotation
+        // Left rotation (inverted - pressing right key now rotates left)
         if (this.inputMap["d"] || this.inputMap["ArrowRight"]) {
-            this.rotateRight();
+            this.rotateLeft();
         }
         
         // Update animation state based on movement

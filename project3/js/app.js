@@ -23,12 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
             modelPath: 'models/player.glb',
             position: new BABYLON.Vector3(0, 0, 0),
             speed: 2.00,
-            scale: 0.01 // Scale the model to half size
+            scale: 0.01 // Scale the model to small size
         }, (player) => {
             console.log('Player created');
             
             // Store player reference in a global variable for debug access
             window.player = player;
+            
+            // Set the camera to follow the player (3rd person view)
+            sceneManager.setPlayerForCamera(player);
         });
         
         // Create some scene objects
