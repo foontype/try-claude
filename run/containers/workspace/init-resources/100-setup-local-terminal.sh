@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Local terminal
-if [ -n "${LOCAL_TERMINAL}" ]; then \
+if [ -n "${LOCAL_TERMINAL}" ]; then
     IFS="|" read -r LOCAL_COMMAND_PATH REMOTE_COMMAND_PATH LOCAL_TERMINAL_REST <<< "${LOCAL_TERMINAL}"
     IFS="|" read -r LOCAL_TERMINAL_ARGS <<< "${LOCAL_TERMINAL_REST}"
 

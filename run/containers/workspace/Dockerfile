@@ -18,6 +18,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
     rm -rf /var/lib/apt/lists/*
 RUN node -v && npm -v
 
+# claude code
+ENV CLAUDE_CONFIG_DIR=/workspace/.claude
+RUN npm config set os linux
+RUN npm install -g @anthropic-ai/claude-code
+
 # init resources
 ADD /run/containers/workspace/init-container.sh /init-container.sh
 ADD /run/containers/workspace/init-resources /init-resources

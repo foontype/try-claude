@@ -10,6 +10,10 @@ task_usage() {
     bask_list_tasks
 }
 
+task_claude() {
+    claude
+}
+
 task_setup() {
     # FIXME: write setup code here.
     echo "there is nothing that needs to be set up in the workspace."
