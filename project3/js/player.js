@@ -18,6 +18,12 @@ class Player extends SceneObject {
         this.rotationSpeed = 0.02; // Reduced rotation speed for slower turning
         this.isMoving = false;
         
+        // Animation names
+        this.walkAnimationName = "Walk";
+        this.idleAnimationName = "Survey";
+        this.currentAnimationName = "";
+        this.currentAnimation = null;
+        
         // Set up input handling
         this.setupInputControls();
     }
@@ -146,20 +152,90 @@ class Player extends SceneObject {
      * Update animation based on player state
      */
     updateAnimation() {
+        // Check if scene has animation groups
+        if (!this.scene.animationGroups || this.scene.animationGroups.length === 0) {
+            console.log("No animation groups found in scene");
+            return;
+        }
+        
+        // Log available animations if we haven't done it yet
+        if (!this._animationsLogged) {
+            console.log("Available animations:");
+            this.scene.animationGroups.forEach(group => {
+                console.log(`- ${group.name}`);
+            });
+            this._animationsLogged = true;
+        }
+        
         // Switch between idle and walk animations based on movement
         if (this.isMoving) {
             // Play walk animation if not already playing
-            if (!this.currentAnimation || this.currentAnimationName !== 'walk') {
-                this.currentAnimationName = 'walk';
-                this.currentAnimation = this.playAnimation('walk');
+            if (!this.currentAnimation || this.currentAnimationName !== this.walkAnimationName) {
+                // Stop current animation if any
+                if (this.currentAnimation) {
+                    this.currentAnimation.stop();
+                }
+                
+                this.currentAnimationName = this.walkAnimationName;
+                
+                // Find the animation group
+                const walkAnimation = this._findAnimationGroup(this.walkAnimationName);
+                if (walkAnimation) {
+                    // Play the walk animation
+                    walkAnimation.start(true); // loop = true
+                    this.currentAnimation = walkAnimation;
+                    console.log(`Playing animation: ${this.walkAnimationName}`);
+                } else {
+                    console.log(`Animation not found: ${this.walkAnimationName}`);
+                }
             }
         } else {
             // Play idle animation if not already playing
-            if (!this.currentAnimation || this.currentAnimationName !== 'idle') {
-                this.currentAnimationName = 'idle';
-                this.currentAnimation = this.playAnimation('idle');
+            if (!this.currentAnimation || this.currentAnimationName !== this.idleAnimationName) {
+                // Stop current animation if any
+                if (this.currentAnimation) {
+                    this.currentAnimation.stop();
+                }
+                
+                this.currentAnimationName = this.idleAnimationName;
+                
+                // Find the animation group
+                const idleAnimation = this._findAnimationGroup(this.idleAnimationName);
+                if (idleAnimation) {
+                    // Play the idle animation
+                    idleAnimation.start(true); // loop = true
+                    this.currentAnimation = idleAnimation;
+                    console.log(`Playing animation: ${this.idleAnimationName}`);
+                } else {
+                    console.log(`Animation not found: ${this.idleAnimationName}`);
+                }
             }
         }
+    }
+    
+    /**
+     * Find an animation group by name or partial name match
+     * @param {string} animationName - Animation name to find
+     * @returns {BABYLON.AnimationGroup|null} Animation group or null if not found
+     * @private
+     */
+    _findAnimationGroup(animationName) {
+        if (!this.scene.animationGroups) return null;
+        
+        // Try exact match first
+        let group = this.scene.animationGroups.find(g => g.name === animationName);
+        
+        // If not found, try case-insensitive match
+        if (!group) {
+            group = this.scene.animationGroups.find(g => g.name.toLowerCase() === animationName.toLowerCase());
+        }
+        
+        // If still not found, try partial match
+        if (!group) {
+            group = this.scene.animationGroups.find(g => g.name.toLowerCase().includes(animationName.toLowerCase()));
+        }
+        
+        return group;
     }
     
     /**

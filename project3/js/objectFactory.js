@@ -20,6 +20,9 @@ class ObjectFactory {
      * @param {BABYLON.Vector3} [options.position] - Initial position (optional)
      * @param {number} [options.speed] - Movement speed (optional)
      * @param {number|BABYLON.Vector3} [options.scale] - Scale factor for the model (optional)
+     * @param {Object} [options.animations] - Animation configuration (optional)
+     * @param {string} [options.animations.walkAnimation] - Name of walking animation
+     * @param {string} [options.animations.idleAnimation] - Name of idle animation
      * @param {Function} [callback] - Callback function when player is created
      */
     createPlayer(id, options = {}, callback) {
@@ -27,7 +30,11 @@ class ObjectFactory {
             modelPath: null,
             position: new BABYLON.Vector3(0, 0, 0),
             speed: 0.1,
-            scale: 1.0
+            scale: 1.0,
+            animations: {
+                walkAnimation: "Walk",
+                idleAnimation: "Survey"
+            }
         };
         
         // Merge default options with provided options
@@ -45,6 +52,22 @@ class ObjectFactory {
                 
                 // Apply scaling to all meshes
                 this._applyScale(meshes, config.scale);
+                
+                // Set animation names
+                if (config.animations) {
+                    if (config.animations.walkAnimation) {
+                        player.walkAnimationName = config.animations.walkAnimation;
+                    }
+                    if (config.animations.idleAnimation) {
+                        player.idleAnimationName = config.animations.idleAnimation;
+                    }
+                }
+                
+                // Log available animations if skeletons are present
+                if (skeletons && skeletons.length > 0) {
+                    console.log(`Available animations for ${id}:`, 
+                        skeletons[0].getAnimationRanges().map(range => range.name));
+                }
                 
                 // Call callback with created player
                 if (callback) callback(player);
@@ -122,6 +145,16 @@ class ObjectFactory {
         // Apply configuration
         player.setPosition(config.position);
         player.setSpeed(config.speed);
+        
+        // Set animation names from config if specified
+        if (config.animations) {
+            if (config.animations.walkAnimation) {
+                player.walkAnimationName = config.animations.walkAnimation;
+            }
+            if (config.animations.idleAnimation) {
+                player.idleAnimationName = config.animations.idleAnimation;
+            }
+        }
         
         // Call callback with created player
         if (callback) callback(player);

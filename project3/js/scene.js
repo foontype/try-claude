@@ -36,8 +36,41 @@ class Scene {
         const canvas = this.engine.getRenderingCanvas();
         this.camera.attachControl(canvas, true);
         
+        // Create ground
+        this.createGround();
+        
         // Set clear color (background color)
         this.scene.clearColor = new BABYLON.Color4(0.05, 0.05, 0.15, 1.0);
+    }
+    
+    /**
+     * Create ground for the scene
+     */
+    createGround() {
+        // Create a large ground plane
+        const ground = BABYLON.MeshBuilder.CreateGround("ground", {
+            width: 100,
+            height: 100,
+            subdivisions: 10
+        }, this.scene);
+        
+        // Position ground slightly below origin to prevent z-fighting with other objects
+        ground.position.y = -0.01;
+        
+        // Create ground material
+        const groundMaterial = new BABYLON.StandardMaterial("groundMaterial", this.scene);
+        groundMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.25, 0.2);
+        groundMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+        
+        // Add a grid pattern to the ground for better visual reference
+        const groundTexture = new BABYLON.GridMaterial("groundGridMaterial", this.scene);
+        groundTexture.gridRatio = 1;
+        groundTexture.mainColor = new BABYLON.Color3(0.2, 0.25, 0.2);
+        groundTexture.lineColor = new BABYLON.Color3(0.4, 0.45, 0.4);
+        groundTexture.opacity = 0.8;
+        
+        // Apply material to ground
+        ground.material = groundTexture;
     }
 
     /**

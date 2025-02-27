@@ -23,7 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
             modelPath: 'models/player.glb',
             position: new BABYLON.Vector3(0, 0, 0),
             speed: 2.00,
-            scale: 0.01 // Scale the model to small size
+            scale: 0.01, // Scale the model to small size
+            animations: {
+                walkAnimation: "Walk", // Animation to play when moving
+                idleAnimation: "Survey" // Animation to play when idle
+            }
         }, (player) => {
             console.log('Player created');
             
