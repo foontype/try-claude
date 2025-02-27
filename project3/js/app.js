@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             animationSpeeds: {
                 idle: 1.0,    // Normal speed for idle animation
                 walk: 1.0,    // Normal speed for walking animation
-                run: 2.4      // Faster speed for running animation
+                run: 1.5      // Faster speed for running animation
             }
         }, (player) => {
             console.log('Player created');

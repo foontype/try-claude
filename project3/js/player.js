@@ -221,14 +221,9 @@ class Player extends SceneObject {
                 
                 // Adjust global animation speed based on movement direction
                 if (this.isMovingBackward) {
-                    // For backward movement, use a special animation time scale
-                    this.scene.animationTimeScale = 0.7;
-                } else if (this.isDashing) {
-                    // For dashing, use a faster animation time scale
-                    this.scene.animationTimeScale = 1.5;
+                    this.scene.animationTimeScale = -speedRatio;
                 } else {
-                    // Normal movement
-                    this.scene.animationTimeScale = 1.0;
+                    this.scene.animationTimeScale = speedRatio;
                 }
                 
                 // Start the animation
@@ -243,13 +238,13 @@ class Player extends SceneObject {
                 if (targetAnimationName === this.runAnimationName) {
                     const walkAnimation = this._findAnimationGroup(this.walkAnimationName);
                     if (walkAnimation) {
-                        // Adjust global animation speed
+                        // Adjust global animation speed based on movement direction
                         if (this.isMovingBackward) {
-                            this.scene.animationTimeScale = 0.7;
+                            this.scene.animationTimeScale = -speedRatio;
                         } else {
-                            this.scene.animationTimeScale = 1.5;
+                            this.scene.animationTimeScale = speedRatio;
                         }
-                        
+                           
                         walkAnimation.start(true);
                         this.currentAnimation = walkAnimation;
                         this.currentAnimationName = this.walkAnimationName;
@@ -257,15 +252,6 @@ class Player extends SceneObject {
                         console.log(`Fallback to animation: ${this.walkAnimationName} (timeScale: ${this.scene.animationTimeScale})`);
                     }
                 }
-            }
-        } else {
-            // Update animation speed if direction changes while keeping same animation
-            if (this.isMovingBackward) {
-                this.scene.animationTimeScale = 0.7;
-            } else if (this.isDashing) {
-                this.scene.animationTimeScale = 1.5;
-            } else {
-                this.scene.animationTimeScale = 1.0;
             }
         }
     }
