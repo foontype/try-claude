@@ -1,0 +1,6 @@
+実装
+
+* prompt4ディレクトリに実装します。
+* babylon.js の AnimationGroup についてまとめた資料を、output.md に出力してください。
+* babylon.js のドキュメントは https://doc.babylonjs.com/typedoc/modules/BABYLON にあります。
+

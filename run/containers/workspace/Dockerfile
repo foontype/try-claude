@@ -25,7 +25,7 @@ RUN npm install -g @anthropic-ai/claude-code
 
 # uv
 ENV UV_INSTALL_DIR="/workspace/.uv"
-ENV PATH="/workspace/.uv/bin:${PATH}"
+ENV PATH="/workspace/.uv:${PATH}"
 
 # init resources
 ADD /run/containers/workspace/init-container.sh /init-container.sh
