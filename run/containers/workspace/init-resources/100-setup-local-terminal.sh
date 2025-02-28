@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+SUDO=""
+if [ ! "$(id -u):$(id -g)" = "0:0" ]; then
+    SUDO="sudo"
+fi
+
 # Local terminal
 if [ -n "${LOCAL_TERMINAL}" ]; then
     IFS="|" read -r LOCAL_COMMAND_PATH REMOTE_COMMAND_PATH LOCAL_TERMINAL_REST <<< "${LOCAL_TERMINAL}"
@@ -11,10 +16,6 @@ if [ -n "${LOCAL_TERMINAL}" ]; then
     for a in ${LOCAL_TERMINAL_ARGS[@]}; do
         LOCAL_COMMAND_ARGS="${LOCAL_COMMAND_ARGS:-}${LOCAL_COMMAND_ARGS:+", "}\"${a}\""
     done
-
-    if [ ! "$(id -u):$(id -g)" = "0:0" ]; then
-        SUDO="sudo"
-    fi
 
     # NOTE: Ensure that paths are consistent between local shell and remote shell.
     #       Remote shell ignores shell arguments.

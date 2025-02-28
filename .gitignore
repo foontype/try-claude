@@ -1,3 +1,4 @@
 /.vscode
 /.claude
+/.uv
 /run/devcontainer/.env
