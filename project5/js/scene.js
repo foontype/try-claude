@@ -67,32 +67,24 @@ class Scene {
             height: 100,
             subdivisions: 10
         }, this.scene);
-        
+
         // Position ground slightly below origin to prevent z-fighting with other objects
         ground.position.y = -0.01;
-        
+
         // Enable collisions for the ground
         ground.checkCollisions = true;
-        
+
         // Set ground to receive shadows
         ground.receiveShadows = true;
-        
+
         // Create ground material
         const groundMaterial = new BABYLON.StandardMaterial("groundMaterial", this.scene);
         groundMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.25, 0.2);
         groundMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
         groundMaterial.receiveShadows = true;
-        
-        // Add a grid pattern to the ground for better visual reference
-        const groundTexture = new BABYLON.GridMaterial("groundGridMaterial", this.scene);
-        groundTexture.gridRatio = 2;
-        groundTexture.mainColor = new BABYLON.Color3(0.2, 0.25, 0.2);
-        groundTexture.lineColor = new BABYLON.Color3(0.4, 0.45, 0.4);
-        groundTexture.opacity = 1;
-        groundTexture.receiveShadows = true;
-        
+
         // Apply material to ground
-        ground.material = groundTexture;
+        ground.material = groundMaterial;
     }
 
     /**
@@ -132,7 +124,7 @@ class Scene {
         if (!mesh || !this.shadowGenerator) return;
         
         // Add the mesh to the shadow generator's shadow casters
-        this.shadowGenerator.addShadowCaster(mesh);
+        this.shadowGenerator.addShadowCaster(mesh, true);
         
         console.log(`Added shadow caster: ${mesh.name}`);
     }

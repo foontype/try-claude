@@ -66,10 +66,6 @@ class ObjectFactory {
                 // Apply scaling to all meshes
                 this._applyScale(meshes, config.scale);
 
-                meshes.forEach(mesh => {
-                    this.scene.shadowGenerator.addShadowCaster(mesh, true);
-                });
-
                 // Set animation names
                 if (config.animations) {
                     if (config.animations.walkAnimation) {
