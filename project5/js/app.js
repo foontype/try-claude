@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the engine
     const engine = new Engine('renderCanvas');
     
-    // Create a scene
-    const sceneManager = new Scene(engine.getEngine());
+    // Create a scene manager
+    const sceneManager = new SceneManager(engine.getEngine());
     const scene = sceneManager.getScene();
     
     // Create model loader
@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
             position: new BABYLON.Vector3(5, 0, 0)
         }, (object) => {
             console.log('Cube created at position (5, 0, 0)');
-            // Enable collision detection for the cube
-            object.setupCollider();
+            // Enable collision detection for the cube with wireframe visualization
+            object.setupCollider(true); // true to show wireframe
             // Make cube cast shadows
             object.castShadows(sceneManager);
             // Store reference to the cube
@@ -65,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
             position: new BABYLON.Vector3(-5, 0, 0)
         }, (object) => {
             console.log('Cube created at position (-5, 0, 0)');
-            // Enable collision detection for the cube
-            object.setupCollider();
+            // Enable collision detection for the cube with wireframe visualization
+            object.setupCollider(true); // true to show wireframe
             // Make cube cast shadows
             object.castShadows(sceneManager);
             // Store reference to the cube
@@ -77,8 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
             position: new BABYLON.Vector3(0, 0, 5)
         }, (object) => {
             console.log('Cube created at position (0, 0, 5)');
-            // Enable collision detection for the cube
-            object.setupCollider();
+            // Enable collision detection for the cube with wireframe visualization
+            object.setupCollider(true); // true to show wireframe
             // Make cube cast shadows
             object.castShadows(sceneManager);
             // Store reference to the cube

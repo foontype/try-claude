@@ -1,7 +1,7 @@
 /**
- * Scene class to handle the BabylonJS scene creation and setup
+ * SceneManager class to handle the BabylonJS scene creation and setup
  */
-class Scene {
+class SceneManager {
     /**
      * Create a new scene
      * @param {BABYLON.Engine} engine - BabylonJS engine instance

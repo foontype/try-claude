@@ -49,6 +49,10 @@ class Player extends SceneObject {
             // Set up collision ellipsoid for the player
             this.rootMesh.ellipsoid = new BABYLON.Vector3(0.5, 1.0, 0.5);
             this.rootMesh.ellipsoidOffset = new BABYLON.Vector3(0, 1.0, 0);
+            
+            // Visualize the collision ellipsoid (optional)
+            // Enable to visualize player collision ellipsoid
+            this.showCollisionEllipsoid();
         }
         
         // Set up input handling
@@ -300,5 +304,42 @@ class Player extends SceneObject {
     setBlendingSpeed(blendingSpeed) {
         this.blendingSpeed = blendingSpeed;
         this.scene.animationPropertiesOverride.blendingSpeed = this.blendingSpeed;
+    }
+    
+    /**
+     * Visualize the player's collision ellipsoid
+     */
+    showCollisionEllipsoid() {
+        if (!this.rootMesh) return;
+        
+        // Create ellipsoid mesh based on the collision ellipsoid
+        const ellipsoid = BABYLON.MeshBuilder.CreateSphere("playerCollisionEllipsoid", {
+            diameterX: this.rootMesh.ellipsoid.x * 2,
+            diameterY: this.rootMesh.ellipsoid.y * 2,
+            diameterZ: this.rootMesh.ellipsoid.z * 2,
+            segments: 16
+        }, this.scene);
+        
+        // Position it according to the ellipsoid offset
+        ellipsoid.position = this.rootMesh.ellipsoidOffset.clone();
+        
+        // Make it a child of the root mesh so it follows
+        ellipsoid.parent = this.rootMesh;
+        
+        // Create a wireframe material
+        const wireMaterial = new BABYLON.StandardMaterial("collisionEllipsoidMaterial", this.scene);
+        wireMaterial.wireframe = true;
+        wireMaterial.emissiveColor = new BABYLON.Color3(1, 0, 0); // Red wireframe
+        wireMaterial.alpha = 0.3; // Very transparent
+        
+        // Apply the material
+        ellipsoid.material = wireMaterial;
+        
+        // Ensure the wireframe doesn't interfere with other operations
+        ellipsoid.isPickable = false;
+        ellipsoid.checkCollisions = false;
+        
+        // Store reference to the ellipsoid visualization
+        this.collisionEllipsoidMesh = ellipsoid;
     }
 }
