@@ -65,7 +65,11 @@ class ObjectFactory {
                 
                 // Apply scaling to all meshes
                 this._applyScale(meshes, config.scale);
-                
+
+                meshes.forEach(mesh => {
+                    this.scene.shadowGenerator.addShadowCaster(mesh, true);
+                });
+
                 // Set animation names
                 if (config.animations) {
                     if (config.animations.walkAnimation) {
@@ -105,11 +109,11 @@ class ObjectFactory {
                 
                 // Call callback with created player
                 if (callback) callback(player);
-            }, (error) => {
-                console.error(`Failed to load player model: ${error}`);
+            }, (error, exception) => {
+                console.error(`Failed to load player model: ${error}: ${exception}`);
                 
                 // Create basic player as fallback
-                this._createBasicPlayer(id, config, callback);
+                //this._createBasicPlayer(id, config, callback);
             });
         } else {
             // Create basic player without model
