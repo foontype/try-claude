@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Set the camera to follow the player (3rd person view)
             sceneManager.setPlayerForCamera(player);
+            
+            // Make player cast shadows
+            player.castShadows(sceneManager);
         });
         
         // Create some scene objects
@@ -50,18 +53,36 @@ document.addEventListener('DOMContentLoaded', () => {
             position: new BABYLON.Vector3(5, 0, 0)
         }, (object) => {
             console.log('Cube created at position (5, 0, 0)');
+            // Enable collision detection for the cube
+            object.setupCollider();
+            // Make cube cast shadows
+            object.castShadows(sceneManager);
+            // Store reference to the cube
+            window.cube1 = object;
         });
         
         objectFactory.createSceneObject('cube2', {
             position: new BABYLON.Vector3(-5, 0, 0)
         }, (object) => {
             console.log('Cube created at position (-5, 0, 0)');
+            // Enable collision detection for the cube
+            object.setupCollider();
+            // Make cube cast shadows
+            object.castShadows(sceneManager);
+            // Store reference to the cube
+            window.cube2 = object;
         });
         
         objectFactory.createSceneObject('cube3', {
             position: new BABYLON.Vector3(0, 0, 5)
         }, (object) => {
             console.log('Cube created at position (0, 0, 5)');
+            // Enable collision detection for the cube
+            object.setupCollider();
+            // Make cube cast shadows
+            object.castShadows(sceneManager);
+            // Store reference to the cube
+            window.cube3 = object;
         });
     }, 1000);
     

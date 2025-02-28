@@ -42,6 +42,15 @@ class Player extends SceneObject {
         this.scene.animationPropertiesOverride.blendingSpeed = this.blendingSpeed;
         this.scene.animationPropertiesOverride.loopMode = 1;
         
+        // Enable collision detection for player
+        if (this.rootMesh) {
+            this.rootMesh.checkCollisions = true;
+            
+            // Set up collision ellipsoid for the player
+            this.rootMesh.ellipsoid = new BABYLON.Vector3(0.5, 1.0, 0.5);
+            this.rootMesh.ellipsoidOffset = new BABYLON.Vector3(0, 1.0, 0);
+        }
+        
         // Set up input handling
         this.setupInputControls();
     }
@@ -136,8 +145,11 @@ class Player extends SceneObject {
             Math.cos(this.rootMesh.rotation.y) * actualSpeed
         );
         
-        this.position.addInPlace(forward);
-        this.updatePosition();
+        // Move with collision detection
+        this.rootMesh.moveWithCollisions(forward);
+        
+        // Update internal position to match mesh position
+        this.position = this.rootMesh.position.clone();
     }
     
     /**
@@ -155,8 +167,11 @@ class Player extends SceneObject {
             -Math.cos(this.rootMesh.rotation.y) * actualSpeed
         );
         
-        this.position.addInPlace(backward);
-        this.updatePosition();
+        // Move with collision detection
+        this.rootMesh.moveWithCollisions(backward);
+        
+        // Update internal position to match mesh position
+        this.position = this.rootMesh.position.clone();
     }
     
     /**

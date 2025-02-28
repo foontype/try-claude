@@ -61,6 +61,33 @@ class SceneObject {
     }
     
     /**
+     * Enable collision detection for this object
+     */
+    setupCollider() {
+        if (!this.rootMesh) return;
+        
+        // Enable collision detection
+        this.rootMesh.checkCollisions = true;
+        
+        console.log(`Collisions enabled for ${this.id}`);
+    }
+    
+    /**
+     * Make this object cast shadows
+     * @param {Scene} sceneManager - The scene manager instance
+     */
+    castShadows(sceneManager) {
+        if (!this.rootMesh || !sceneManager) return;
+        
+        // Make all meshes cast shadows
+        for (const mesh of this.meshes) {
+            sceneManager.addShadowCaster(mesh);
+        }
+        
+        console.log(`${this.id} is now casting shadows`);
+    }
+    
+    /**
      * Play an animation on the object
      * @param {string} animationName - Name of the animation to play
      * @param {boolean} loop - Whether to loop the animation

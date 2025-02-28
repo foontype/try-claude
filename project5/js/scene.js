@@ -16,9 +16,20 @@ class Scene {
      * Set up the basic scene components
      */
     setupScene() {
-        // Create a basic light
-        const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), this.scene);
-        light.intensity = 0.7;
+        // Create hemispheric light for ambient lighting
+        const hemisphericLight = new BABYLON.HemisphericLight("hemisphericLight", new BABYLON.Vector3(0, 1, 0), this.scene);
+        hemisphericLight.intensity = 0.3; // Reduced intensity to make shadows more visible
+        
+        // Create directional light for shadows
+        this.shadowLight = new BABYLON.DirectionalLight("shadowLight", new BABYLON.Vector3(-1, -2, -1), this.scene);
+        this.shadowLight.position = new BABYLON.Vector3(10, 20, 10);
+        this.shadowLight.intensity = 0.5;
+        
+        // Create shadow generator
+        this.shadowGenerator = new BABYLON.ShadowGenerator(1024, this.shadowLight);
+        this.shadowGenerator.useBlurExponentialShadowMap = true; // Softer shadows
+        this.shadowGenerator.blurKernel = 32; // Blur amount for shadows
+        this.shadowGenerator.depthScale = 50; // Better for outdoor scenes
 
         // Create a follow camera for 3rd person view (initial target is set to origin)
         // We'll update this when the player is created
@@ -35,6 +46,9 @@ class Scene {
         // Get the canvas from the engine passed to constructor
         const canvas = this.engine.getRenderingCanvas();
         this.camera.attachControl(canvas, true);
+        
+        // Enable collisions for the entire scene
+        this.scene.collisionsEnabled = true;
         
         // Create ground
         this.createGround();
@@ -56,6 +70,12 @@ class Scene {
         
         // Position ground slightly below origin to prevent z-fighting with other objects
         ground.position.y = -0.01;
+        
+        // Enable collisions for the ground
+        ground.checkCollisions = true;
+        
+        // Set ground to receive shadows
+        ground.receiveShadows = true;
         
         // Create ground material
         const groundMaterial = new BABYLON.StandardMaterial("groundMaterial", this.scene);
@@ -100,5 +120,18 @@ class Scene {
      */
     getCamera() {
         return this.camera;
+    }
+    
+    /**
+     * Add a mesh to cast shadows
+     * @param {BABYLON.AbstractMesh} mesh - The mesh that will cast shadows
+     */
+    addShadowCaster(mesh) {
+        if (!mesh || !this.shadowGenerator) return;
+        
+        // Add the mesh to the shadow generator's shadow casters
+        this.shadowGenerator.addShadowCaster(mesh);
+        
+        console.log(`Added shadow caster: ${mesh.name}`);
     }
 }
